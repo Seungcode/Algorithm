@@ -9,3 +9,5 @@ FROM FISH_INFO
 GROUP BY FISH_TYPE
 HAVING AVG(ifnull(LENGTH, 10)) >= 33
 ORDER BY FISH_TYPE;
+
+# 후기 : HAVING절에서도 ifnull을 통해 조건을 부여할 수 있다..!
