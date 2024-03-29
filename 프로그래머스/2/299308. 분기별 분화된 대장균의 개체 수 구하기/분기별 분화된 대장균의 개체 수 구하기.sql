@@ -1,0 +1,12 @@
+-- 코드를 작성해주세요
+# CONCAT -> 문자열을 합치는 함수 -> 분기 이름 뒤에 Q붙일 때 사용
+# FLOOR -> 내림 함수
+# 분기를 계산하는 서브쿼리를 만들어서 조인한 후 분기별로 묶어서 출력
+SELECT QUARTER, COUNT(*) AS ECOLI_COUNT
+FROM ECOLI_DATA
+JOIN 
+(SELECT 
+ CONCAT(FLOOR((MONTH(DIFFERENTIATION_DATE)-1)/3)+1, 'Q') AS QUARTER, ID
+ FROM ECOLI_DATA) AS A ON ECOLI_DATA.ID = A.ID
+GROUP BY QUARTER
+ORDER BY QUARTER;
