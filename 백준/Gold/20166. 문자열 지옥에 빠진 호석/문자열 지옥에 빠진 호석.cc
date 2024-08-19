@@ -30,7 +30,7 @@ int main() {
         string a;
         cin>>a;
         res.push_back(a);
-        answer[a] ++;
+        answer[a] = 1;
     }
 
     string temp = "";
