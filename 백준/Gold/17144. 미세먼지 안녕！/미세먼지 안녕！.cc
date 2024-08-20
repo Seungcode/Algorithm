@@ -1,5 +1,4 @@
 #include <iostream>
-#include <algorithm>
 
 using namespace std;
 
@@ -19,6 +18,7 @@ int dx_2[4] = {0, 1, 0, -1};
 
 void make_arr(){
 
+    //temp 초기화
     for(int i = 0; i<N; i++) {
         for(int j = 0; j<M; j++) temp[i][j] = 0;
     }
@@ -42,14 +42,14 @@ void make_arr(){
         }
     }
 
+    //arr배열 초기화
     for(int i = 0; i<N; i++) {
-        for(int j = 0; j<M; j++) arr[i][j] = 0;
+        for(int j = 0; j<M; j++) arr[i][j] = temp[i][j];
     }
 
-    arr[Y][0] = -1;
-    arr[Y+1][0] = -1;
-
     //공기청정기 순회
+    
+    //상단 공기청정기
     int nx = Y;
     int ny = 0;
 
@@ -64,6 +64,7 @@ void make_arr(){
         }
     }
 
+    //하단 공기청정기
     nx = Y+1;
     ny = 0;
 
@@ -77,26 +78,17 @@ void make_arr(){
         }
     }
 
-    for(int i = 1; i<Y; i++){
-        for(int j = 1; j<M-1; j++) arr[i][j] = temp[i][j];
-    }
-
-    for(int i = Y+2; i<N-1; i++){
-        for(int j = 1; j<M-1; j++) arr[i][j] = temp[i][j];
-    }
-
 }
 int main() {
     cin>>N>>M>>K;
 
+    //미세먼지 입력받기
     for(int i = 0; i<N; i++) {
         for(int j = 0; j<M; j++) cin>>arr[i][j];
         if(Y==0&&arr[i][0] == -1) Y = i;
     }
 
-    for(int i = 0; i<K; i++){
-        make_arr();
-    }
+    for(int i = 0; i<K; i++) make_arr();
 
     int now = 0;
     for(int i = 0; i<N; i++) {
