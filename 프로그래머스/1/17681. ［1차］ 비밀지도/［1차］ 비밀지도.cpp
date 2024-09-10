@@ -7,27 +7,27 @@ vector<string> solution(int n, vector<int> arr1, vector<int> arr2) {
     vector<string> answer;
     
     for(int i = 0; i<n; i++){
-        string secret = "";
-        string final_secret = "";
+        //현재 수
+        int first = arr1[i];
+        int second = arr2[i];
         
-        //2진수로 바꾸어 지도 생성 -> 반대로 뒤집어줘야함
+        //임시 문자열
+        string temp = "";
+        
         for(int j = 0; j<n; j++){
-            if(arr1[i]%2==1 || arr2[i]%2==1)
-                secret += '#';
-            else
-                secret += ' ';
-            arr1[i] = arr1[i]/2;
-            arr2[i] = arr2[i]/2;
+            //둘 중 하나라도 1일경우 -> #추가
+            if(first%2 || second%2) temp += '#';
+            //둘 다 0일경우 -> 공백 추가
+            else temp += ' ';
+            first /= 2;
+            second /= 2;
         }
         
-        //뒤집어주기
-        for(int j = n-1; j>=0; j--)
-            final_secret += secret[j];
+        //문자열 역으로 만들기
+        string result = "";
+        for(int j = n-1; j>=0; j--) result += temp[j];
         
-        //답 넣어주기
-        answer.push_back(final_secret);
+        answer.push_back(result);
     }
-    
-    //문제유형 : 구현 
     return answer;
 }
