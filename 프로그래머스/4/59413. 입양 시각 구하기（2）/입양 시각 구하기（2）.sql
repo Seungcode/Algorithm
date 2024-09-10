@@ -1,0 +1,9 @@
+-- 코드를 입력하세요
+SET @HOUR := -1;
+
+SELECT @HOUR := @HOUR + 1 AS HOUR, 
+       IFNULL((SELECT COUNT(*) 
+               FROM ANIMAL_OUTS 
+               WHERE HOUR(DATETIME) = @HOUR), 0) AS COUNT
+FROM ANIMAL_OUTS
+LIMIT 24;
