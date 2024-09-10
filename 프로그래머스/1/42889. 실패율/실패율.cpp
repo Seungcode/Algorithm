@@ -5,48 +5,39 @@
 
 using namespace std;
 
-//정렬을 위한 비교함수
-bool com(pair<int, double> a, pair<int, double> b){
-    if(a.second == b.second)
-        return a.first < b.first;
-    return a.second > b.second;
+//vector 정렬을 위한 함수
+bool comp(pair<double, int> a, pair<double, int> b){
+    if(a.first == b.first) return a.second < b.second;
+    return a.first > b.first;
 }
 
 vector<int> solution(int N, vector<int> stages) {
     vector<int> answer;
     
-    //스테이지에 있는 사람 수
-    map <int, int> arr;
+    //실패율과 각 스테이지에 머무는 사람을 저장하기 위한 배열
+    vector<pair<double, int>> fail; 
+    map<int, double> now;
     
-    //실패율을 담기 위함
-    vector<pair<int, double>> fail;
+    //사람 수 초기화
+    double people = stages.size();
     
-    //사람 수
-    int person = 0;
+    //스테이지당 사람 수 세기 -> N+1은 굳이 고려 X
+    for(auto i : stages) now[i]++;
     
-    //스테이지별 사람 수 저장
-    for(auto i : stages){
-        if(i==N+1)
-            person++;
-        arr[i] ++;
+    //1스테이지부터 실패율을 구한 후 현재 스테이지에 머무는 사람을 빼줌 -> 다음 스테이지로 간 사람 수
+    for(int i = 1; i<=N; i++){
+        if(people == 0) fail.push_back({0, i});
+        else fail.push_back({now[i]/people, i});
+        people -= now[i];
     }
     
-    //실패율 저장
-    for(int i = N; i>=1; i--){
-        person += arr[i];
-        if(person == 0)
-            fail.push_back({i, 0});
-        else
-            fail.push_back({i, (double)arr[i]/person});
+    //정렬
+    sort(fail.begin(), fail.end(), comp);
+    
+    //정답 배열에 스테이지 넣어주기
+    for(auto i : fail) {
+        answer.push_back(i.second);
     }
     
-    //기준에 맞춰 정렬
-    sort(fail.begin(), fail.end(), com);
-    
-    //배열에 맞는 값 넣어주기
-    for(auto i : fail)
-        answer.push_back(i.first);
-    
-    //문제유형 : 구현
     return answer;
 }
