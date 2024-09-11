@@ -1,38 +1,45 @@
 #include <string>
 #include <vector>
+#include <algorithm>
 
 using namespace std;
 
-bool IS_Prime(long long int j){
-    for(long long int i = 2; i*i<=j; i++){
-        if(j%i==0) return false;
-    }
+//소수 찾기
+bool find_prime(long long n){
+    if(n<2) return false;
+    for(long long i = 2; i*i<=n; i++)
+        if(n%i == 0) return false;
     return true;
 }
 
 int solution(int n, int k) {
     int answer = 0;
-    vector<int> arr;
-    string a = "";
     
-    //진수 변환
-    while(n > 0){
+    //n진수로 변환
+    string a = "";
+    while(n!=0){
         a += to_string(n%k);
         n = n/k;
     }
     
-    //숫자화하기
-    long long int temp = 0;
-    for(int i = a.length()-1; i>=0; i--){
-        if(a[i] == '0') {
-            if(IS_Prime(temp) && temp > 1) answer++;
-            temp = 0;
+    reverse(a.begin(), a.end());
+    
+    string temp = "";
+    
+    for(auto i : a){
+        //0이오고 temp에 수가 있다면
+        if(i=='0' && temp.length() > 0){
+            if(find_prime(stol(temp))) answer++;
+            temp = "";
         }
-        else temp = temp*10 + (a[i]-'0');
+        //연속으로 0이 온다면
+        else if(i=='0') continue;
+        //수가 온다면
+        else temp += i;
     }
-    if(IS_Prime(temp) && temp > 1) answer++;
+    
+    //마지막에 0이 아닌 수로 끝났다면
+    if(temp.length() > 0 && find_prime(stol(temp))) answer++;
     
     return answer;
-    
-    //문제유형 : 수학
 }
