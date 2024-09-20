@@ -1,66 +1,47 @@
 #include <string>
-#include <deque>
+#include <vector>
 using namespace std;
 
 string solution(string new_id) {
-    string answer = "";
-    
-    //erase 사용을 위해 deque선언
-    deque <char> arr;
-    
-    //문자열 담아주기
-    for(int i = 0; i<new_id.length(); i++)
-        arr.push_back(new_id[i]);
-    
     //1단계
-    for(int i = 0; i<arr.size(); i++)
-        if(arr[i] - 'A' < 26 && arr[i]-'A' >= 0) arr[i] += 32;
+    for(int i = 0; i<new_id.length(); i++)
+        new_id[i] = tolower(new_id[i]);
     
     //2단계
-    for(int i = 0; i<arr.size(); i++){
-        if(arr[i] == '-' || 
-           arr[i] == '_' || 
-           arr[i] == '.' || 
-           (arr[i] - '0' >= 0 && arr[i] - '0' <= 9) || 
-           (arr[i] - 'a' >= 0 && arr[i] - 'a' < 26))
-            continue;
-        
-        else{
-            arr.erase(arr.begin() + i);
-            i--;
-        }
-    }
+    string temp = "";
+    for(int i = 0; i<new_id.length(); i++)
+        if(new_id[i] == '-' || 
+           new_id[i] == '_' || 
+           new_id[i] == '.' || 
+           (new_id[i] <= '9' && new_id[i] >= '0') || 
+           (new_id[i] >= 'a' && new_id[i] <= 'z')) 
+            temp += new_id[i];
+    
+    new_id = temp;
     
     //3단계
-    for(int i = 1; i<arr.size(); i++){
-        if(arr[i] == '.' && arr[i-1] == '.'){
-            arr.erase(arr.begin() + i);
-            i--;
-        }
+    temp = "";
+    for(int i = 0; i<new_id.length(); i++){
+        if(temp.back() == '.' && new_id[i] == '.') continue;
+        temp += new_id[i];
     }
     
     //4단계
-    if(!arr.empty())
-        if(arr.front() == '.') arr.pop_front();
-    if(!arr.empty())
-        if(arr.back() == '.') arr.pop_back();
-    
+    new_id = temp;
+    if(new_id[0] == '.') new_id.erase(new_id.begin());
+    if(new_id.back() == '.') new_id.pop_back();
+        
     //5단계
-    if(arr.empty()) arr.push_back('a');
+    if(new_id.length() == 0) new_id = "aaa";
     
     //6단계
-    while(arr.size() >= 16)
-        arr.pop_back();
-    if(arr.back() == '.') arr.pop_back();
+    if(new_id.length() >= 16) new_id = new_id.substr(0, 15);
+    if(new_id.back() == '.') new_id.pop_back();
     
     //7단계
-    while(arr.size() < 3)
-        arr.push_back(arr.back());
+    while(new_id.length() <= 2){
+        new_id += new_id.back();
+    }
     
-    //정답 생성
-    for(auto i : arr)
-        answer+=i;
-    
-    //문제유형 : 구현
-    return answer;
+    return new_id;
 }
