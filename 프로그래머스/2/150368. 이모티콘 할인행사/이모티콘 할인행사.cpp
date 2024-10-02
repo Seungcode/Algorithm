@@ -1,86 +1,67 @@
 #include <string>
 #include <vector>
+#include <queue>
 #include <map>
 
 using namespace std;
 
-//변수 설정
-vector<vector<int>> u;
-vector<int> e;
-vector<int> u_e[5];
-map<int, int> buy;
-vector<int> answer;
+vector<int> emozi;
+vector<int> buy[5];
+map<int, int> e_plus;
+map<int, int> cost;
+priority_queue<pair<int, int>> q;
 
-//재귀 함수
-void find(int sale, int n){
-    //다 돌았을 경우
-    if(n==e.size()){
-        int plus = 0;
+void make_sale(int now, int sales){
+    //끝까지 확인이 끝났다면
+    if(now == emozi.size()) {
         int cnt = 0;
-        //플러스 가입자와 아닌 경우를 나눠 계산
-        for(int i = 0; i<u.size(); i++){
-            if(buy[i]<u[i][1]) cnt+=buy[i];
-            else plus++;
+        int count = 0;
+        
+        for(auto i : cost){
+            if(i.second >= e_plus[i.first]) cnt++;
+            else count += i.second;
         }
-        //처음일 경우
-        if(answer.empty()){
-            answer.push_back(plus);
-            answer.push_back(cnt);
-            return;
-        }
-        //플러스 가입자가 같은 경우
-        else if(answer[0] == plus){
-            answer[1] = (max(cnt, answer[1]));
-            return;
-        }
-        //플러스 가입자가 더 많은 경우
-        else if(answer[0] < plus){
-            answer[0] = plus;
-            answer[1] = cnt;
-            return;
-        }
+        
+        q.push({cnt, count});
         return;
     }
     
-    //가격 계산
-    int price = e[n]*0.1*(10-sale);
+    int sale_cost = emozi[now] - (int)((double)emozi[now]*(0.1*sales));
     
-    //구매하는 사람들에게 더해주기
-    for(int i = sale; i>=0; i--){
-        for(int j = 0; j<u_e[i].size(); j++){
-            buy[u_e[i][j]] += price;
+    //판매 금액 계산
+    for(int i = 0; i<=sales; i++){
+        for(auto j : buy[i]){
+            cost[j] += sale_cost;
         }
     }
     
-    //다음 이모티콘으로
-    for(int i = 1; i<=4; i++)
-        find(i, n+1);
+    for(int i = 1; i<=4; i++) make_sale(now + 1, i);
     
-    //값 지워주기
-    for(int i = sale; i>=0; i--){
-        for(int j = 0; j<u_e[i].size(); j++){
-            buy[u_e[i][j]] -= price;
+    //판매 금액 초기화
+    for(int i = 0; i<=sales; i++){
+        for(auto j : buy[i]){
+            cost[j] -= sale_cost;
         }
     }
-    
 }
 
 vector<int> solution(vector<vector<int>> users, vector<int> emoticons) {
-    u = users;
-    e = emoticons;
+    vector<int> answer;
     
-    //할인율 저장
+    emozi = emoticons;
+    
     for(int i = 0; i<users.size(); i++){
-        if(users[i][0]%10==0){
-            u_e[users[i][0]/10].push_back(i);
+        if(users[i][0] <= 40){
+            if(users[i][0] % 10 == 0) buy[users[i][0]/10].push_back(i);
+            else buy[users[i][0] / 10 + 1].push_back(i);
+            e_plus[i] = users[i][1];
         }
-        else
-            u_e[(users[i][0]/10)+1].push_back(i);
     }
     
-    for(int i = 1; i<=4; i++)
-        find(i, 0);
+    for(int i = 1; i<=4; i++) make_sale(0, i);
     
-    //문제 유형 : 완탐
+    answer.push_back(q.top().first);
+    answer.push_back(q.top().second);
+    
     return answer;
 }
