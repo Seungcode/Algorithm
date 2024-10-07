@@ -5,32 +5,34 @@
 
 using namespace std;
 
+//현재 수가 배열에 추가되었는지 확인하기 위한 map
+map<int, int> visited;
+
+//배열 크기 순으로 정렬
 bool comp(vector<int> a, vector<int> b){
     return a.size() < b.size();
 }
 
 vector<int> solution(string s) {
     vector<int> answer;
-    vector<vector<int>> arr;
-    map<int, int> cnt;
     
-    for(int i = 1; i<s.length()-1; i++)
-    {
+    vector<vector<int>> arr;
+    
+    for(int i = 1; i<s.length()-1; i++){
+        //문자열 -> 배열
         if(s[i] == '{'){
+            i++;
             vector<int> temp;
-            int now = 0;
-            for(int j = i+1; j<s.length()-1; j++){
-                if(s[j] == '}') {
-                    temp.push_back(now);
-                    break;
+            int num = 0;
+            while(s[i]!='}'){
+                if(s[i] == ',') {
+                    temp.push_back(num);
+                    num = 0;
                 }
-                if(s[j] == ',') {
-                    temp.push_back(now);
-                    now = 0;
-                }
-                else now = now*10 + (s[j] - '0');
+                else num = num*10 + (s[i] - '0');
                 i++;
             }
+            temp.push_back(num);
             arr.push_back(temp);
         }
     }
@@ -39,12 +41,12 @@ vector<int> solution(string s) {
     
     for(auto i : arr){
         for(auto j : i){
-            if(cnt[j] == 0) answer.push_back(j);
-            cnt[j]++;
+            if(visited[j] == 0){
+                visited[j] ++;
+                answer.push_back(j);
+                break;
+            }
         }
     }
-    
-    //문제유형 : 구현 + 정렬
-    
     return answer;
 }
