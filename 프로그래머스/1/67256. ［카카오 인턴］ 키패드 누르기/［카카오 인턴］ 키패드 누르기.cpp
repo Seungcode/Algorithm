@@ -4,60 +4,58 @@
 
 using namespace std;
 
+map <int, pair<int, int>> pad;
+
 string solution(vector<int> numbers, string hand) {
     string answer = "";
     
-    //시작점 초기화
-    pair<int, int> left = {3, 0};
-    pair<int, int> right = {3, 2};
-    
-    //패드의 위치를 저장할 map 선언
-    map <int, pair<int, int>> pad;
-    
-    //키보드 별 위치 저장
     pad[0] = {3, 1};
-    for(int i = 0; i<9; i++)
-        pad[i+1] = {i/3, i%3};
+    for(int i = 1; i<10; i++) pad[i] = {(i-1) / 3, (i-1) % 3};
     
-    //위치 계산
-    for(auto i  : numbers){
-        //왼손으로 가기
-        if(i%3 == 1){
-            answer += "L";
-            left = pad[i];
+    pair<int, int> r_h = {3, 0};
+    pair<int, int> l_h = {3, 2};
+    
+    char p_h = hand == "right" ? 'R' : 'L' ;
+    
+    for(auto i : numbers){
+        //왼 손 사용
+        if(i % 3 == 1) {
+            answer += 'L';
+            l_h = pad[i];
         }
-        //오른손으로 가기
-        else if(i%3 == 0 && i!=0){
-            answer += "R";
-            right = pad[i];
+        
+        //오른 손 사용
+        else if(i % 3 == 0 && i != 0) {
+            answer += 'R';
+            r_h = pad[i];
         }
-        //중간일 경우
+        
+        //중간 열 일 때
         else{
-            //같다면
-            if(abs(left.first - pad[i].first) + abs(left.second - pad[i].second) == abs(right.first - pad[i].first) + abs(right.second - pad[i].second)){
-                if(hand == "right"){
-                    answer += "R";
-                    right = pad[i];
-                }
-                else{
-                    answer += "L";
-                    left = pad[i];
-                }
+            pair<int, int> pad_l = pad[i];
+            
+            //거리가 같을 때
+            if(abs(pad_l.first - r_h.first) + abs(pad_l.second - r_h.second) 
+               == abs(pad_l.first - l_h.first) + abs(pad_l.second - l_h.second)){
+                if(p_h == 'L') l_h = pad[i];
+                else r_h = pad[i];
+                answer += p_h;
             }
-            //오른손이랑 더 가깝다면
-            else if(abs(left.first - pad[i].first) + abs(left.second - pad[i].second) > abs(right.first - pad[i].first) + abs(right.second - pad[i].second)){
-                answer += "R";
-                right = pad[i];
+            
+            //왼손이 더 가까울 때
+            else if(abs(pad_l.first - r_h.first) + abs(pad_l.second - r_h.second) 
+               > abs(pad_l.first - l_h.first) + abs(pad_l.second - l_h.second)){
+                answer += 'L';
+                l_h = pad[i];
             }
-            //왼손이랑 더 가깝다면
+            
+            //오른손이 더 가까울 때
             else{
-                answer += "L";
-                left = pad[i];
+                answer += 'R';
+                r_h = pad[i];
             }
         }
     }
-    
-    //문제유형 : 구현
     
     return answer;
 }
