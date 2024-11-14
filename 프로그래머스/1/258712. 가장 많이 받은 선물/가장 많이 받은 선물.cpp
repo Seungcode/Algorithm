@@ -4,51 +4,42 @@
 
 using namespace std;
 
+map<string, int> arr;
+int given[51][51];
+int score[51];
+
 int solution(vector<string> friends, vector<string> gifts) {
     int answer = 0;
-    //선물 주고 받은 갯수 저장소
-    int result[51][51] = {0, };
-    map<string, int> name;
-    map<string, int> give;
-    //이름별로 인덱스 번호 부여 -> map사용
-    for(int i = 0; i<friends.size(); i++)
-        name[friends[i]] = i;
-    //선물별로 주고 받은 사람 정리
-    for(auto i : gifts){
-        string a = "";
-        string b = "";
-        int cnt = 0;
-        //준 사람
-        while(true){
-            if(i[cnt]==' '){
-                cnt++;
-                break;
-            }
-            a += i[cnt];
-            cnt++;
-        }
-        //받은 사람
-        while(cnt<i.length()){
-            b += i[cnt];
-            cnt++;
-        }
-        give[a]++;
-        give[b]--;
-        result[name[a]][name[b]]++;
+    
+    for(int i = 1; i<=friends.size(); i++){
+        arr[friends[i-1]] = i;
     }
     
-    //다음달 받을 선물 갯수 정리
-    for(auto i : friends){
-        int cnt = 0;
-        for(auto j : friends){
-            if((result[name[i]][name[j]] == 0 && result[name[j]][name[i]] == 0)||result[name[i]][name[j]] == result[name[j]][name[i]]){
-                if(give[i]>give[j])
-                    cnt++;
+    for(auto i : gifts){
+        string temp;
+        string name = "";
+        for(auto j : i){
+            if(j==' '){
+                temp = name;
+                name = "";
             }
-            else if(result[name[i]][name[j]] > result[name[j]][name[i]])
-                cnt++;
+            else name += j;
         }
-        answer = max(answer, cnt);
+        given[arr[name]][arr[temp]] --;
+        given[arr[temp]][arr[name]] ++;
+        score[arr[temp]]++;
+        score[arr[name]]--;
     }
+    
+    for(int i = 1; i<=friends.size(); i++){
+        int temp = 0;
+        for(int j = 1; j<=friends.size(); j++){
+            if(i==j) continue;
+            if(given[i][j] > 0) temp ++;
+            else if(given[i][j] == 0 && score[i] > score[j]) temp ++;
+        }
+        answer = max(answer, temp);
+    }
+    
     return answer;
 }
