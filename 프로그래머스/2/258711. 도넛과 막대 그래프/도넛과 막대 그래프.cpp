@@ -1,76 +1,42 @@
 #include <string>
 #include <vector>
-#include <queue>
 #include <map>
 
 using namespace std;
-bool visited[1000001] = {false, };
-vector<int> graph[1000001];
+
+map<int, int> node_in;
+map<int, int> node_out;
+
 
 vector<int> solution(vector<vector<int>> edges) {
     vector<int> answer;
+    int node = 0;
     
-    //시작점을 구하기 위함 -> 들어오는 간선이 없다면 그 점이 시작점일 것
-    map<int, int> start;
-    
-    //간선 정리
     for(auto i : edges){
-        graph[i[0]].push_back(i[1]);
-        start[i[1]]++;
+        node = max(node, max(i[0], i[1]));
+        node_out[i[0]]++;
+        node_in[i[1]]++;
     }
     
-    //시작점 구하고 나머지 값 초기화하기
-    for(int i = 1; i<=1000000; i++){
-        if(start[i]==0 && graph[i].size()>=2){
-            answer.push_back(i);
+    int s_node;
+    
+    for(int i = 1; i <= node; i++){
+        if(node_in[i] == 0 && node_out[i] > 1){
+            s_node = i;
             break;
         }
     }
-    answer.push_back(0);
-    answer.push_back(0);
-    answer.push_back(0);
     
-    //어떤 모양인지 구하기
-    for(int i = 0; i<graph[answer[0]].size(); i++){
-        queue <pair<int, int>> q;
-        
-        //시작점 넣어주기
-        q.push({answer[0], graph[answer[0]][i]});
-        
-        //bfs 시작
-        while(!q.empty()){
-            int now = q.front().first;
-            int end = q.front().second;
-            q.pop();
-            
-            //더 가는 간선이 없다 -> 직선모양
-            if(graph[end].size()==0) answer[2]++;
-            
-            //나가는 간선이 2개이다 -> 8자 모양
-            if(graph[end].size()==2){
-                answer[3]++;
-                break;
-            }
-            
-            //그 외의 경우
-            else{
-                for(auto j : graph[end]){
-                    //시작점으로 돌아올 경우 -> 간선이 2개가 아니고 시작점 -> 도넛 모양
-                    if(j == graph[answer[0]][i]){
-                        answer[1]++;
-                        break;
-                    }
-                    
-                    //아닐 경우 추가 탐색
-                    if(visited[j]==false){
-                        visited[j] = true;
-                        q.push({end, j});
-                    }
-                }
-            }
-        }
+    answer.push_back(s_node);
+      
+    for(int i = 0; i<3; i++) answer.push_back(0);
+    
+    for(int i = 1; i<=node; i++){
+        if(node_in[i] >= 2 && node_out[i] >= 2) answer[3] ++;
+        else if(node_in[i] > 0 && node_out[i] == 0) answer[2] ++;
     }
     
-    //문제유형 : bfs + 구현
+    answer[1] = node_out[s_node] - answer[2] - answer[3];
+    
     return answer;
 }
