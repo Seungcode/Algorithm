@@ -1,84 +1,107 @@
-#include <stdio.h>
-#include <string.h>
-#include <limits.h>
+#include <iostream>
 
-#define INF	20001
+using namespace std;
 
-#define MIN(x, y)	(((x) < (y))? (x) : (y))
-#define MAX(x, y)	(((x) > (y))? (x) : (y))
+int T, N, W;
+int visited[10001][3];
+int arr[10001][2];
+int min_num = 20002;
 
-int N, T, W;
-int dy[10002][3];
-int val[10002][2];
+//방문 배열 초기화
+void initArr(){
+    for(int j = 0; j<=N; j++) {
+        for(int z = 0; z < 3; z++)
+            visited[j][z] = 0;
+    }
 
-enum{fir, sec, whl};
-
-void logic1(const int st) {
-	for (int i = st; i <= N; i++) {
-		int fir_fill = (val[i][fir] + val[i - 1][fir] <= W) ? 1 : 2;
-		int sec_fill = (val[i][sec] + val[i - 1][sec] <= W) ? 1 : 2;
-		int whl_fill = (val[i][fir] + val[i][sec] <= W) ? 1 : 2;
-
-		dy[i][fir] = MIN(dy[i - 1][whl] + 1, dy[i - 1][sec] + fir_fill);
-		dy[i][sec] = MIN(dy[i - 1][whl] + 1, dy[i - 1][fir] + sec_fill);
-
-		dy[i][whl] = MIN(dy[i][fir] + 1, dy[i][sec] + 1);
-		dy[i][whl] = MIN(dy[i][whl], dy[i - 1][whl] + whl_fill);
-		dy[i][whl] = MIN(dy[i][whl], dy[i - 2][whl] + fir_fill + sec_fill);
-	}
-	return;
+    for(int j = 0; j<=N; j++) {
+        for(int z = 0; z < 2; z++)
+            arr[j][z] = 0;
+    }
 }
 
-int main(void) {
-	int valt;
-	scanf("%d", &T);
-	for (int hg = 0; hg < T; hg++) {
-		memset(val, 0, sizeof(val));
-		memset(dy, 0, sizeof(dy));
+void logic(){
+    for(int i = 2; i<=N; i++){
+        //만일 합이 더 크다면 -> 현재 칸 이전 칸 총 2개의 소대를 보내야 함
+        int fir_fill = arr[i][0] + arr[i - 1][0] <= W ? 1 : 2;
+        int sec_fill = arr[i][1] + arr[i - 1][1] <= W ? 1 : 2;
+        int whl_fill = arr[i][0] + arr[i][1] <= W ? 1 : 2;
 
-		scanf("%d %d", &N, &W);
-		for (int i = 1; i <= N; i++) { scanf("%d", &val[i][fir]); }
-		for (int i = 1; i <= N; i++) { scanf("%d", &val[i][sec]); }
+        //기본 -> [2] + 1 즉, 이전까지 보낸 내용 + 한 소대 더 & 이전내용까지 동일 + 현재 보내야 하는 소대를 비교
+        visited[i][0] = min(visited[i - 1][2] + 1, visited[i - 1][1] + fir_fill);
+        visited[i][1] = min(visited[i - 1][2] + 1, visited[i - 1][0] + sec_fill);
 
-		if (N == 1) {
-			printf("%d\n", (val[1][fir] + val[1][sec] <= W) ? 1 : 2);
-			continue;
-		}
+        //내부와 외부를 채웠다면 최종적으로 해당 칸을 채우기 위해 필요한 수 정리
+        visited[i][2] = min(visited[i][0] + 1, visited[i][1] + 1);
+        visited[i][2] = min(visited[i][2], visited[i - 1][2] + whl_fill);
+        visited[i][2] = min(visited[i][2], visited[i - 2][2] + fir_fill + sec_fill);
+    }
+}
 
-		dy[1][fir] = dy[1][sec] = 1;
-		dy[1][whl] = ((val[1][fir] + val[1][sec]) <= W) ? 1 : 2;
-		logic1(2);
-		valt = dy[N][whl];
+void solution(){
+    //원형 고려 -> 4개지의 경우를 구해주기
+    visited[1][0] = visited[1][1] = 1;
+    visited[1][2] = ((arr[1][0] + arr[1][1]) <= W) ? 1 : 2;
+    logic();
+    min_num = visited[N][2];
 
-		dy[0][whl] = INF;
-		if (val[1][fir] + val[N][fir] <= W) {
+    visited[0][2] = 20002;
+    if (arr[1][0] + arr[N][0] <= W) {
+        visited[1][0] = 1;
+        visited[1][1] = 20002;
+        visited[1][2] = 2;
 
-			dy[1][fir] = 1;
-			dy[1][sec] = INF;
-			dy[1][whl] = 2;
-			logic1(2);
+        logic();
+        min_num = min(min_num, visited[N][1]);
+    }
 
-			valt = MIN(valt, dy[N][sec]);
-		}
+    if (arr[1][1] + arr[N][1] <= W) {
+        visited[1][0] = 20002;
+        visited[1][1] = 1;
+        visited[1][2] = 2;
 
-		if (val[1][sec] + val[N][sec] <= W) { //not else if
-			dy[1][fir] = INF;
-			dy[1][sec] = 1;
-			dy[1][whl] = 2;
-			logic1(2);
+        logic();
+        min_num = min(min_num, visited[N][0]);
+    }
 
-			valt = MIN(valt, dy[N][fir]);
-		}
+    if ((arr[1][0] + arr[N][0] <= W) && (arr[1][1] + arr[N][1] <= W)) {
+        visited[1][0] = visited[1][1] = 20002;
+        visited[1][2] = 2;
 
-		if ((val[1][fir] + val[N][fir] <= W) && (val[1][sec] + val[N][sec] <= W)) { //unoptimizationed
-			dy[1][fir] = dy[1][sec] = INF;
-			dy[1][whl] = 2;
-			logic1(2);
+        logic();
+        min_num = min(min_num, visited[N-1][2]);
+    }
 
-			valt = MIN(valt, dy[N - 1][whl]);
-		}
+    cout<<min_num<<endl;
+}
 
-		printf("%d\n", valt);
-	}
-	return 0;
+//입력받기
+void input(){
+    cin>>T;
+
+    for(int i = 0; i<T; i++) {
+        initArr();
+
+        cin>>N>>W;
+
+        for(int j = 1; j<=N; j++) cin>>arr[j][0];
+        for(int j = 1; j<=N; j++) cin>>arr[j][1];
+
+        if(N==1){
+            if(arr[1][0] + arr[1][1] <= W) cout<<1<<endl;
+            else cout<<2<<endl;
+            continue;
+        }
+
+        solution();
+    }
+}
+
+int main() {
+    ios::sync_with_stdio(false);
+    cin.tie(NULL);
+
+    input();
+
+    return 0;
 }
