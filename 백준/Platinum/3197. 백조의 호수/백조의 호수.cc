@@ -1,15 +1,13 @@
 #include <iostream>
 #include <queue>
 #include <vector>
-#include <cstring>
 
 using namespace std;
 
 int N, M;
-vector<pair<int, int>> swan;
 vector<int> parent;
+vector<pair<int, int>> swan;
 queue<pair<int, int>> water;
-bool visited[1501][1501] = {false, };
 int dx[4] = {0, 0, 1, -1};
 int dy[4] = {1, -1, 0, 0};
 int arr[1501][1501];
