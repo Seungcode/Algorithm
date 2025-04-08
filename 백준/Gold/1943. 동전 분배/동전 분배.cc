@@ -22,7 +22,7 @@ void input(){
     }
 }
 
-void canDivide() {
+bool canDivide() {
     int target = cost / 2;
     possible[0] = true;
 
@@ -34,11 +34,14 @@ void canDivide() {
             if(possible[j]) {
                 for(int k = 1; k <= count; k++) {
                     if(j + value * k > target) break;
+                    if(j+value*k == target) return true;
                     possible[j + value * k] = true;
                 }
             }
         }
     }
+
+    return false;
 }
 
 void solution() {
@@ -51,9 +54,7 @@ void solution() {
             continue;
         }
 
-        canDivide();
-
-        cout<<possible[cost/2]<<"\n";
+        cout<<canDivide()<<"\n";
     }
 }
 
