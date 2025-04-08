@@ -1,14 +1,16 @@
 #include <iostream>
 #include <vector>
 #include <cstring>
+
 using namespace std;
 
 int N, cost;
 pair<int, int> coin[100];
-int dp[50001]; // 최대 cost의 절반은 25000까지 가능
+bool possible[50001] = {false, };
 
 void init() {
     for(int i = 0; i<N; i++) coin[i] = {0, 0};
+    memset(possible, false, sizeof(possible));
 }
 
 void input(){
@@ -20,16 +22,14 @@ void input(){
     }
 }
 
-bool canDivide() {
+void canDivide() {
     int target = cost / 2;
-    vector<bool> possible(target + 1, false);
     possible[0] = true;
 
     for(int i = 0; i < N; i++) {
         int value = coin[i].first;
         int count = coin[i].second;
 
-        // 다중 동전 처리: 거꾸로 순회하며 count만큼 사용
         for(int j = target; j >= 0; j--) {
             if(possible[j]) {
                 for(int k = 1; k <= count; k++) {
@@ -39,8 +39,6 @@ bool canDivide() {
             }
         }
     }
-
-    return possible[target];
 }
 
 void solution() {
@@ -53,7 +51,9 @@ void solution() {
             continue;
         }
 
-        cout << (canDivide() ? "1" : "0") << "\n";
+        canDivide();
+
+        cout<<possible[cost/2]<<"\n";
     }
 }
 
