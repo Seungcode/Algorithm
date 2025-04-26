@@ -4,7 +4,7 @@
 #include <unordered_set>
 using namespace std;
 
-int N, M, idx = 0;
+int N, M, idx = 0, answer = 0;
 
 int visit[1001][1001] = {0, };
 string arr[1001];
@@ -47,6 +47,7 @@ void bfs(int x, int y){
             q.push({nx, ny});
         }
         else if(find(idx) != find(visit[nx][ny])){
+            answer--;
             unionNode(idx, visit[nx][ny]);
         }
     }
@@ -67,6 +68,7 @@ void solution() {
     for(int i = 0; i<N; i++){
         for(int j = 0; j<M; j++){
             if(visit[i][j] == 0){
+                answer++;
                 idx++;
                 parent.push_back(idx);
                 visit[i][j] = idx;
@@ -75,14 +77,7 @@ void solution() {
         }
     }
 
-
-    unordered_set<int> answer;
-
-    for(auto i : parent){
-        answer.insert(i);
-    }
-
-    cout<<answer.size() - 1;
+    cout<<answer;
 }
 
 int main() {
