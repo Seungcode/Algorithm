@@ -9,10 +9,6 @@ unordered_map<long long, long long> cnt;
 
 void input() {
     cin>>N>>K;
-
-    for(int i = 1; i <= N; i++){
-        cin>>arr[i];
-    }
 }
 
 void solution() {
@@ -21,6 +17,7 @@ void solution() {
     long long answer = 0;
 
     for(int i = 1; i <= N; i++){
+        cin>>arr[i];
         arr[i] += arr[i-1];
         if(arr[i] == K) answer++;
         answer += cnt[arr[i] - K];
