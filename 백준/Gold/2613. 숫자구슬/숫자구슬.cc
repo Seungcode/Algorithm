@@ -1,89 +1,89 @@
-
 #include <iostream>
-#include<vector>
+
 using namespace std;
 
-int marble_num, group_num;
-vector<int> marble_v;
-vector<int> group_v;
+int N, M;
+int arr[301] = {0, };
+int maxNum;
+int low = 0, high, middle;
 
-int PosGroupNum(int limit){
-    int marble_sum=0,group_count =0;
-
-    for(int i=0; i<marble_v.size() ; ++i){
-        marble_sum +=marble_v[i];
-        if(marble_sum>limit){
-            marble_sum =marble_v[i];
-            group_count++;
-        }
+void input() {
+    cin >> N >> M;
+    for (int i = 1; i <= N; i++) {
+        cin >> arr[i];
+        low = max(low, arr[i]);
+        arr[i] += arr[i-1];
     }
-
-    if(marble_sum>0)
-        group_count++;
-
-    return group_count;
 }
 
-void MakeGroup(int limit){
-    int marble_sum=0,member_count=0,group_count =group_num;
-    for(int i=0; i<marble_v.size() ; ++i){
-        marble_sum +=marble_v[i];
+bool find(int size) {
+    int idx = 0;
+    int final = 0;
 
-        if(marble_sum>limit){
-            marble_sum =marble_v[i];
-            group_v.push_back(member_count);
-            member_count=0;
-            --group_count;
+    for(int i = 1; i <= N; i++){
+        if(arr[i] - arr[final] == size) {
+            idx++;
+            final = i;
         }
-        ++member_count;
+        else if(arr[i] - arr[final] > size){
+            idx++;
+            final = i - 1;
+        }
+    }
 
-        if(group_count ==marble_num -i){
-            group_v.push_back(member_count);
-            for(int j = marble_num -(i+1); j>0 ; --j)
-                group_v.push_back(1);
+    if(final != N) idx ++;
+    return idx <= M;
+}
 
+void makeGroup(int size){
+    int final = 0;
+
+    for (int i = 1; i <= N; i++) {
+        if (arr[i] - arr[final] > size) {
+            cout << i - 1 - final << " ";
+            final = i - 1;
+            M--;
+        }
+        else if (arr[i] - arr[final] == size) {
+            cout << i - final << " ";
+            final = i;
+            M--;
+        }
+
+        if(M == 1){
+            cout<<N - final;
             return;
         }
-
+        
+        if (M == N - final) break;
     }
-    if(marble_sum>0)
-        group_v.push_back(member_count);
+
+    for (int i = final + 1; i <= N; i++) {
+        cout << "1 ";
+    }
+}
+
+
+void solution() {
+    input();
+
+    high = arr[N];
+
+    while(low < high) {
+        middle = (low + high)/2;
+        if(!find(middle))
+            low = middle + 1;
+        else high = middle;
+    }
+
+    cout<<low<<"\n";
+    makeGroup(low);
 }
 
 int main() {
-    ios_base::sync_with_stdio(0);
-    cin>>marble_num>>group_num;
+    ios::sync_with_stdio(false);
+    cin.tie(nullptr);
+    cout.tie(nullptr);
 
-    int temp,marble_sum=0, max_marble=0;
-    for(int i=0; i<marble_num ; ++i){
-        cin>>temp;
-        marble_v.push_back(temp);
-        max_marble = max(max_marble, temp);
-        marble_sum+= temp;
-    }
-
-    int mid_num,group_count=0;
-    int left = max_marble, right = marble_sum;
-
-    int group_result,answer=300000;
-    while(left<=right){
-        mid_num = (left+right)/2;
-        group_result=PosGroupNum(mid_num);
-
-        if(group_result> group_num){
-            left = mid_num +1;
-        }else{
-            right = mid_num -1;
-            if(mid_num < answer)
-                answer = mid_num;
-        }
-    }
-
-    cout<<answer<<'\n';
-    MakeGroup(answer);
-    for(int i=0; i<group_v.size() ; ++i)
-        cout<<group_v[i]<<' ';
-
-    cout<<'\n';
-    return 0;
+    solution();
 }
