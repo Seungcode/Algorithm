@@ -1,13 +1,12 @@
 #include <iostream>
 #include <queue>
-#include <unordered_set>
+
 using namespace std;
 
-int N, K;
+int N, K, cnt = 0;
 int arr[500001];
-queue<int> pos[500001];
 int idx[500001];
-unordered_set<int> plugged;
+queue<int> pos[500001];
 
 struct Info {
     int next_idx;
@@ -36,21 +35,22 @@ void solution() {
     for (int i = 0; i < K; ++i) {
         int device = arr[i];
         pos[arr[i]].pop();
-        idx[device] = pos[arr[i]].empty() ? 500001 : pos[arr[i]].front();
 
-        if(!plugged.count(device)) {
-            if (plugged.size() == N) {
+        if(idx[device] == 0) {
+            if (cnt == N) {
                 while (!pq.empty()) {
                     Info top = pq.top();
                     pq.pop();
-                    if (plugged.count(top.device) == 0) continue;
-                    plugged.erase(top.device);
+                    if (idx[top.device] == 0) continue;
+                    idx[top.device] = 0;
                     break;
                 }
                 answer++;
             }
-            plugged.insert(device);
+            else cnt ++;
         }
+
+        idx[device] = pos[arr[i]].empty() ? 500001 : pos[arr[i]].front();
 
         pq.push({idx[device], device});
     }
