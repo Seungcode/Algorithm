@@ -21,7 +21,7 @@ void solution() {
 
     long long index = K % M == 0 ? K+1 : (K / M + 1) * M + 1;
 
-    for(int i = 0; i<=M; i++){
+    for(int i = 0; i<=N; i++){
 
         long long tempUp = index%N == 0 ? index/N : index/N + 1;;
         long long tempUnder = index%M == 0 ? index/M : index/M + 1;
